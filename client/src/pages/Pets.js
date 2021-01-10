@@ -16,7 +16,7 @@ const ALL_PETS = gql`
   }
 `
 
-const CREATE_PET = gql`
+const NEW_PET = gql`
   mutation AddPet($newPet: NewPetInput!) {
     addPet(input: $newPet) {
       id
@@ -30,10 +30,16 @@ const CREATE_PET = gql`
 export default function Pets() {
   const [modal, setModal] = useState(false)
   const { data, loading, error } = useQuery(ALL_PETS)
-  const [
-    createPet,
-    { createPetData, createPetLoading, createPetError },
-  ] = useMutation(CREATE_PET)
+
+  const [createPet, newPet] = useMutation(NEW_PET, {
+    update(cache, { data: { addPet } }) {
+      const { pets } = cache.readQuery({ query: ALL_PETS })
+      cache.writeQuery({
+        query: ALL_PETS,
+        data: { pets: [addPet, ...pets] },
+      })
+    },
+  })
 
   const onSubmit = (input) => {
     createPet({
@@ -51,11 +57,11 @@ export default function Pets() {
     return <NewPetModal onSubmit={onSubmit} onCancel={() => setModal(false)} />
   }
 
-  if (loading || createPetLoading) {
+  if (loading || newPet.loading) {
     return <Loader />
   }
 
-  if (error || createPetLoading) {
+  if (error || newPet.error) {
     return <h1>Error!</h1>
   }
 
