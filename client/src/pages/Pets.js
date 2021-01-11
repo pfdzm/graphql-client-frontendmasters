@@ -23,6 +23,7 @@ const NEW_PET = gql`
       name
       type
       img
+      __typename
     }
   }
 `
@@ -49,6 +50,16 @@ export default function Pets() {
           type: input.type,
         },
       },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        addPet: {
+          __typename: 'Pet',
+          id: 'petId',
+          name: input.name,
+          type: input.type,
+          img: 'https://via.placeholder.com/300',
+        },
+      },
     })
     setModal(false)
   }
@@ -57,7 +68,7 @@ export default function Pets() {
     return <NewPetModal onSubmit={onSubmit} onCancel={() => setModal(false)} />
   }
 
-  if (loading || newPet.loading) {
+  if (loading) {
     return <Loader />
   }
 
