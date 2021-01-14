@@ -15,6 +15,7 @@ const PETS_FIELDS = gql`
       id
       age @client
     }
+    isVaccinated @client
   }
 `
 
@@ -66,6 +67,11 @@ export default function Pets() {
           name: input.name,
           type: input.type,
           img: 'https://via.placeholder.com/300',
+          owner: {
+            id: 'ownerId',
+            age: 69,
+          },
+          isVaccinated: false,
         },
       },
     })
